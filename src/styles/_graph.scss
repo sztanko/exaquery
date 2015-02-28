@@ -1,0 +1,160 @@
+$queryColor: rgb(200,200,200);
+$sessionColor: lighten($queryColor, 10%);
+$serviceColor: darken($queryColor, 10%);
+$serviceText: darken($serviceColor, 80%);
+$queryGroupColor: #A3C2C2;
+
+$queryTypes: (
+TRANSACTION: #8c564b, //COMMIT, ROLLBACK
+DQL: #2ca02c, //SELECT
+OTHER: #7f7f7f, //OPEN SCHEMA, ALTER SESSION, FLUSH STATISTICS, DESCRIBE, NO OP
+DML: #bcbd22, //TRUNCATE TABLE, INSERT, DELETE, IMPORT, EXPORT, MERGE, UPDATE
+DDL: #ff7f0e, //DROP TABLE, CREATE TABLE, DROP VIEW, CREATE VIEW
+UNKNOWN: #17becf, //NOT SPECIFIED
+DCL: #e377c2, //GRANT OBJECT"
+);
+
+.popup{
+background-color: white;
+opacity: 0.95;
+font-size: 10px;
+padding: 10px;
+position: absolute;
+display: none;
+left: 0px;
+top: 0px;
+max-width: 500px;
+//height: 300px;
+z-index: 10000;
+border: 2px solid $serviceColor;
+
+max-height: 700px;
+overflow: auto;
+
+.focusMsg{
+color: $queryColor;
+}
+
+.sessionId{
+    color: $serviceText;
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 0px;
+    padding: 0px;
+    
+}
+code{
+    font-size: 10px;
+    line-height: 130%;
+}
+.errorMsg{
+display: block;
+color: red;
+margin-bottom: 10px;
+}
+.queryInfo{
+    font-weight: bold;
+@each $qType, $fillColor in $queryTypes {
+    .#{$qType} {
+        border: 1px solid $fillColor;
+        color: $fillColor;
+    }
+}
+}
+.sql{
+display: block;
+max-height: 200px;
+overflow: auto;
+}
+}
+.session{
+fill: $sessionColor;
+stroke-width: 0;
+stroke: darken($sessionColor, 10%);
+}
+
+
+.querygroup{
+fill: $queryGroupColor;
+stroke: darken($queryGroupColor, 40%);
+stroke-width: 0.5;
+&.fail {
+        stroke: red;
+        stroke-width: 3;
+        stroke-dasharray: 1 1;
+}    
+}
+.query{
+fill: $queryColor;
+//stroke-dasharray: 1 5;
+stroke: none; //darken($queryColor, 10%);
+    &.fail {
+        stroke: red;
+        stroke-width: 3;
+    }
+@each $qType, $fillColor in $queryTypes {
+    &.#{$qType} {
+        fill: $fillColor;
+    }
+}
+&:hover {
+    stroke: $serviceColor;
+    stroke-dasharray: 3 3;
+    stroke-width: 3;
+}
+}
+.channelList {
+    .background{
+        fill: lighten($serviceColor,30%);
+    }
+}
+
+.channelName {
+    text{
+        font-size: 9px;
+        fill: $serviceText;
+        dominant-baseline: central;
+    }
+    rect{
+        fill: none;
+        stroke: $serviceColor;
+    }
+}
+
+.channel line{
+    stroke: $serviceColor;
+    stroke-dasharray: 1 1;
+}
+
+.timeScale{
+    text{
+        fill: $serviceText;
+    }
+    .tick{
+        text{
+            font-size: 10px;
+        }
+        line{
+            stroke: $serviceColor;
+            stroke-dasharray: 2 2;
+        }
+    }
+    path{
+        stroke: $serviceColor;
+        stroke-width: 1px;
+        fill: none;
+    }
+}
+
+.controls{
+    padding: 3px;
+    border: 1px solid $serviceColor;
+
+    .loading{
+    padding-left: 20px;
+    display: inline;
+    color: red;
+    content: "Fetching data from the server. Please be patient"
+    
+}
+}

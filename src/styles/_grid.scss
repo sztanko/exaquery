@@ -1,0 +1,17 @@
+.wrap div{
+border: 1px solid rgba(red, .2);
+}
+
+.side {
+    //@include span(1);
+    width: 200px;
+}
+
+.center{
+    margin-left: 228px;
+    @include span(4 last);
+}
+
+.full{
+    @include span(5);
+}
