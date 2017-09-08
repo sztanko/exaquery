@@ -31,3 +31,9 @@ public/main.css
 .fontcustom-manifest.json
 public/fonts/
 public/main.css.map
+
+# Python
+*.pyc
+
+# Mac
+.DS_Store
