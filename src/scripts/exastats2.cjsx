@@ -19,7 +19,7 @@ module.exports = React.createClass
   displayName: 'Exagraph'
   mixins: [Router.State, Router.Navigation]
   getDefaultProps: () ->
-    view = 
+    view =
         width: $(document).width()
         leftWidth: 250
         rowHeight: 12
@@ -31,10 +31,10 @@ module.exports = React.createClass
         minDuration: 20
         maxDuration: 5 * 3600 * 1000 #5 hours
     url = ""
-    #max_ts = 1419438269268 
+    #max_ts = 1419438269268
     max_ts = new Date().getTime()
     min_ts = max_ts - 3600 * 1000
-    return {view: view, min_ts: min_ts, max_ts: max_ts, controls: controls, url: "http://bi1.mlan:5002/"}
+    return {view: view, min_ts: min_ts, max_ts: max_ts, controls: controls, url: "http://api.hotpanel.mlan:5012/"}
 
   getInitialState: () ->
     return {
@@ -113,7 +113,7 @@ module.exports = React.createClass
           return (<div className="exagraph loading">
               <h1>Loading data</h1>
           </div>)
-          
+
     return (
         <div className='exagraph'>
             <Popup visible={@state.popup.visible} contentRenderer={@state.popup.contentRenderer} event={@state.popup.event} onFocusEvent={@onPopupFocusChange}/>
