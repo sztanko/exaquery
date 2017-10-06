@@ -46,7 +46,7 @@
   "license": "MIT",
   "repository": "https://github.com/sztanko/exaquery.git",
   "scripts": {
-    "start": "./node_modules/.bin/gulp watch",
-    "build": "./node_modules/.bin/gulp build"
+    "start": "gulp watch",
+    "build": "gulp build"
   }
 }
