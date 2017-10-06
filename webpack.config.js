@@ -22,13 +22,13 @@ module.exports = {
     new webpack.IgnorePlugin(/vertx/) // https://github.com/webpack/webpack/issues/353
   ],
   resolve: {
-    extensions: ['', '.js', '.cjsx', '.coffee']
+    extensions: ['', '.js', '.jsx']
   },
   module: {
     loaders: [
       { test: /\.css$/, loaders: ['style', 'css']},
-      { test: /\.cjsx$/, loaders: ['react-hot', 'coffee', 'cjsx']},
-      { test: /\.coffee$/, loader: 'coffee' }
+      { test: /\.jsx$/, loaders: ['react-hot', 'babel']},
+      { test: /\.js$/, loaders: ['babel']}
     ]
   }
 };
