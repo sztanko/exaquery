@@ -37,7 +37,7 @@ csv.field_size_limit(int(sys.maxsize/10))
 def process_export_file(fName, fields):
     out = []
     origin = datetime.datetime(1970, 1, 1)
-    with open(fName, 'rb') as csvfile:
+    with open(fName, 'r') as csvfile:
         r = csv.reader(csvfile, delimiter='\t')
         fields_len = len(fields)
         for row in r:
