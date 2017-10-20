@@ -1,26 +1,59 @@
-from flask import Flask
 import sys
-import ujson as json
-from decorators.crossdomain import crossdomain
-from flask import request
-#from flask.ext.gzip import Gzip
-from flask_compress import Compress
 import datetime
 import time
-import sys
 import os
 import csv
-import pyodbc
 import uuid
 import subprocess
 
+from flask import Flask, request
+from flask_compress import Compress
+import ujson as json
+
+from decorators.crossdomain import crossdomain
+
+
 app = Flask(__name__)
 
-
-query_fields = ["session_id", "stmt_id", "command_name", "command_class", "duration", "start_time", "stop_time", "cpu", "temp_db_ram_peak", "hdd_read",
-                "hdd_write", "net", "success", "error_code", "error_text", "scope_schema", "priority", "nice", "resources", "row_count", "execution_mode", "sql_text"]
-session_fields = ["session_id", "login_time", "logout_time", "user_name", "client",
-                  "driver", "encrypted", "host", "os_user", "os_name", "success", "error_code", "error_text"]
+query_fields = [
+    "session_id",
+    "stmt_id",
+    "command_name",
+    "command_class",
+    "duration",
+    "start_time",
+    "stop_time",
+    "cpu",
+    "temp_db_ram_peak",
+    "hdd_read",
+    "hdd_write",
+    "net",
+    "success",
+    "error_code",
+    "error_text",
+    "scope_schema",
+    "priority",
+    "nice",
+    "resources",
+    "row_count",
+    "execution_mode",
+    "sql_text"
+]
+session_fields = [
+    "session_id",
+    "login_time",
+    "logout_time",
+    "user_name",
+    "client",
+    "driver",
+    "encrypted",
+    "host",
+    "os_user",
+    "os_name",
+    "success",
+    "error_code",
+    "error_text"
+]
 ts_fields = ['start_time', 'stop_time', 'login_time', 'logout_time']
 bool_fields = ['success', 'encrypted']
 user="user"
@@ -32,7 +65,8 @@ exaplus_cmd = "/usr/local/bin/exajload -u %s -P %s -c exasol.local:8563" % (user
 tmp_dir = '/local/tmp/'
 
 date_format = '%Y-%m-%d %H:%M:%S.%f'
-csv.field_size_limit(int(sys.maxsize/10))
+csv.field_size_limit(int(sys.maxsize / 10))
+
 
 def process_export_file(fName, fields):
     out = []
@@ -62,52 +96,17 @@ def process_export_file(fName, fields):
 
 def get_query(queryPack):
     start = time.time()
-    query_file = '%s/exaquery_%s.sql' % (tmp_dir, str(uuid.uuid4()))
     pre_q = "alter session set NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF3'"
     for qq in queryPack:
         tmp_file = '%s/exaquery_%s.tsv' % (tmp_dir, str(uuid.uuid4()))
         qq['tmp_file'] = tmp_file
         q = "export (%s) into local CSV FILE '%s' column separator = 'TAB' BOOLEAN = '1/0' replace" % (
             qq['q'], tmp_file)
-        cmd = "%s -presql \"%s\" -sql \"%s\"" %(exaplus_cmd, pre_q, q)
-        print "executing %s" %(cmd)
-        qq['p'] = subprocess.Popen(cmd, shell = True)
+        cmd = "%s -presql \"%s\" -sql \"%s\"" % (exaplus_cmd, pre_q, q)
+        print "executing %s" % (cmd)
+        qq['p'] = subprocess.Popen(cmd, shell=True)
     for qq in queryPack:
         qq['p'].communicate()
-    #os.system("%s -f %s" %(exaplus_cmd, query_file))
-    # os.remove(query_file)
-    out = []
-    for qq in queryPack:
-        out.append(process_export_file(qq['tmp_file'], qq['fields']))
-    print "Done in %.3f seconds" % (time.time() - start)
-    return out
-
-def get_query_old(queryPack):
-    start = time.time()
-    query_file = '%s/exaquery_%s.sql' % (tmp_dir, str(uuid.uuid4()))
-    pre_q = "alter session set NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF3'"
-    for qq in queryPack:
-        tmp_file = '%s/exaquery_%s.tsv' % (tmp_dir, str(uuid.uuid4()))
-        qq['tmp_file'] = tmp_file
-        q = "export (%s) into local CSV FILE '%s' column separator = 'TAB' BOOLEAN = '1/0' replace" % (
-            qq['q'], tmp_file)
-        sqlF.write("%s;\n" % (q))
-# print "Connecting to exasol"
-    #conn = connect()
-    #cur = conn.cursor()
-    # cur.execute(pre_q)
-    # cur.execute(q)
-    # conn.close()
-    cmd = "%s -B %s" % (exaplus_cmd, query_file)
-    print "Executing %s" % (cmd)
-    # , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    process = subprocess.Popen(cmd, shell=True)
-    print "Opened cmd"
-    # process.wait()
-    process.communicate()
-    print "Finished communicate"
-    #os.system("%s -f %s" %(exaplus_cmd, query_file))
-    # os.remove(query_file)
     out = []
     for qq in queryPack:
         out.append(process_export_file(qq['tmp_file'], qq['fields']))
@@ -126,10 +125,8 @@ def to_json(from_ts, to_ts):
     # print sys.argv
     q = "select * from EXA_DBA_AUDIT_SQL where stop_time>='%s' and start_time<='%s'" % (
         parseTs(from_ts), parseTs(to_ts))
-    #queries = get_query(q, query_fields)
     session_q = "select * from exa_dba_audit_sessions where session_id in (select session_id from exa_dba_audit_sql where stop_time>='%s' and start_time<='%s')" % (
         parseTs(from_ts), parseTs(to_ts))
-    #sessions = get_query(session_q, session_fields)
     queries, sessions = get_query(
         [{'q': q, 'fields': query_fields}, {'q': session_q, 'fields': session_fields}])
     out = {'queries': queries, 'sessions': sessions}
@@ -147,6 +144,7 @@ def get():
     out = to_json(from_ts, to_ts)
     print "Done with request"
     return out
+
 
 gzapp = Compress(app)
 
