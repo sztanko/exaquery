@@ -5,6 +5,7 @@ import os
 import csv
 import uuid
 import subprocess
+import logging
 
 from flask import Flask, request
 from flask_compress import Compress
@@ -13,7 +14,13 @@ import ujson as json
 from decorators.crossdomain import crossdomain
 
 
+logger = logging.getLogger(__name__)
+
 app = Flask(__name__)
+app.config.from_object('settings')
+
+if os.environ.get('SETTINGS'):
+    app.config.from_object(os.environ['SETTINGS'])
 
 query_fields = [
     "session_id",
@@ -56,13 +63,17 @@ session_fields = [
 ]
 ts_fields = ['start_time', 'stop_time', 'login_time', 'logout_time']
 bool_fields = ['success', 'encrypted']
-user="user"
-pwd="password"
-exaplus_cmd = "/usr/local/bin/exaplus -u %s -p %s -c exasol.local:8563" % (user, pwd)
+user = app.config['EXASOL_USER']
+pwd = app.config['EXASOL_PASSWORD']
+exaplus_cmd = "{exaplus} -u {user} -p {pwd} -c {exasol}".format(
+    exaplus=app.config['EXAPLUS_BIN'], user=user, pwd=pwd, exasol=app.config['EXASOL_HOST']
+)
 
-exaplus_cmd = "/usr/local/bin/exajload -u %s -P %s -c exasol.local:8563" % (user, pwd)
+exaplus_cmd = "{exajload} -u {user} -P {pwd} -c {exasol}".format(
+    exajload=app.config['EXAJLOAD_BIN'], user=user, pwd=pwd, exasol=app.config['EXASOL_HOST']
+)
 
-tmp_dir = '/local/tmp/'
+tmp_dir = app.config['TEMP_DIR']
 
 date_format = '%Y-%m-%d %H:%M:%S.%f'
 csv.field_size_limit(int(sys.maxsize / 10))
@@ -80,8 +91,6 @@ def process_export_file(fName, fields):
                 fieldName = fields[i]
                 v = row[i]
                 if fieldName in ts_fields and len(v) > 0:
-                    # print fieldName, v
-                    # print row
                     t = datetime.datetime.strptime(v, date_format)
                     v = (t - origin).total_seconds()
                 elif fieldName in bool_fields:
@@ -103,14 +112,14 @@ def get_query(queryPack):
         q = "export (%s) into local CSV FILE '%s' column separator = 'TAB' BOOLEAN = '1/0' replace" % (
             qq['q'], tmp_file)
         cmd = "%s -presql \"%s\" -sql \"%s\"" % (exaplus_cmd, pre_q, q)
-        print "executing %s" % (cmd)
+        logger.info("executing %s", cmd)
         qq['p'] = subprocess.Popen(cmd, shell=True)
     for qq in queryPack:
         qq['p'].communicate()
     out = []
     for qq in queryPack:
         out.append(process_export_file(qq['tmp_file'], qq['fields']))
-    print "Done in %.3f seconds" % (time.time() - start)
+    logger.info("Done in %.3f seconds", time.time() - start)
     return out
 
 
@@ -122,7 +131,6 @@ def parseTs(ts):
 
 
 def to_json(from_ts, to_ts):
-    # print sys.argv
     q = "select * from EXA_DBA_AUDIT_SQL where stop_time>='%s' and start_time<='%s'" % (
         parseTs(from_ts), parseTs(to_ts))
     session_q = "select * from exa_dba_audit_sessions where session_id in (select session_id from exa_dba_audit_sql where stop_time>='%s' and start_time<='%s')" % (
@@ -140,13 +148,17 @@ def get():
     from_ts = to_ts - 3600000
     from_ts = int(float(request.args.get('from_ts', from_ts)))
     to_ts = int(float(request.args.get('to_ts', to_ts)))
-    print "Requesting new data for period between %s and %s" % (from_ts, to_ts)
+    logger.info("Requesting new data for period between %s and %s", from_ts, to_ts)
     out = to_json(from_ts, to_ts)
-    print "Done with request"
+    logger.info("Done with request")
     return out
 
 
 gzapp = Compress(app)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True, port=50020)
+    app.run(
+        host=app.config['EXAQUERY_HOST'],
+        port=app.config['EXAQUERY_PORT'],
+        debug=app.config['DEBUG']
+    )
