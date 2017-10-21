@@ -65,9 +65,6 @@ ts_fields = ['start_time', 'stop_time', 'login_time', 'logout_time']
 bool_fields = ['success', 'encrypted']
 user = app.config['EXASOL_USER']
 pwd = app.config['EXASOL_PASSWORD']
-exaplus_cmd = "{exaplus} -u {user} -p {pwd} -c {exasol}".format(
-    exaplus=app.config['EXAPLUS_BIN'], user=user, pwd=pwd, exasol=app.config['EXASOL_HOST']
-)
 
 exaplus_cmd = "{exajload} -u {user} -P {pwd} -c {exasol}".format(
     exajload=app.config['EXAJLOAD_BIN'], user=user, pwd=pwd, exasol=app.config['EXASOL_HOST']
