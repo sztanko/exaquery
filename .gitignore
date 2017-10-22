@@ -37,3 +37,6 @@ public/main.css.map
 
 # Mac
 .DS_Store
+
+# Visual Studio Code
+.vscode
