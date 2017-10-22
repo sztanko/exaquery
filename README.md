@@ -1,42 +1,83 @@
-Coffee React Quickstart
-=======================
+# Exaquery
 
-Quickstart for creating React.js web applications.
+## Server
 
-It has a number of nice goodies baked in including:
+Server's code is in the `src/python` directory, `cd` into it to work on the backend code.
 
-* Live reloading for both CSS *and* Javascript! This really speeds up development. Live reloading is powered by the [Webpack module bundler](http://webpack.github.io/) and [react-hot-loader](https://github.com/gaearon/react-hot-loader) projects.
-* Write your JSX in Coffeescript thanks to [coffee-react-transform](https://github.com/jsdf/coffee-react-transform).
-* Amazing URL-driven-development (UDD) with the [react-router project](https://github.com/rackt/react-router).
-* Uses [Gulp](http://gulpjs.com/) for building CSS and Javascript. Run `gulp watch` for rebuilding css/js on the fly while developing and `gulp build` to create minified versions for deploying to production.
-* Includes sensible element stylings and several useful Sass plugins:
-  * <a href="http://susy.oddbird.net/">Susy</a>: best-of-breed grid system.
-  * <a href="https://github.com/Team-Sass/modular-scale">modular-scale</a>: easily create pleasing modular type scales.
-  * <a href="https://github.com/jhardy/Sassy-Buttons">Sassy Buttons</a>: flexible button styling.
-  * <a href="http://breakpoint-sass.com/">Breakpoint</a>: Super simple media queries.
+### Install dependencies
 
-## Install dependencies
+To install the server's dependencies run:
 
-Clone this repo and then after entering the new directory run `npm install` and `bundle install`. This will install the respective NPM and Ruby Gem dependencies.
+```bash
+pip install -r requirements.txt
+```
 
-You'll also need to have gulp installed globally to run the coffeescript gulpfile: `npm install -g gulp`
+### Development
 
-## Development
-Run in the root of your directory: `gulp watch`
+To run the local server for development execute:
 
-This will watch the src directories and build on changes and placed the built css and js files in the public directory. It'll serve everything in the /public directory at localhost:8080
+```bash
+<env_vars> python server.py
+```
 
-Then try editing `src/scripts/hello_world.cjsx` and see your changes magically show up in your browser with *no* page reload!
+where `env_vars` is a list of environment variables listed here:
 
-### If styles don't show up
-Restart `gulp watch` and reload your browser.
+* *DEBUG*: enables debug mode if set to `True` or `1`. Default is off.
+* *EXAJLOAD_BIN*: full path including the filename of the `exajload` binary. Default is `/usr/local/bin/exajload`.
+* *EXASOL_HOST*: hostname of the Exasol instance including the port numeber. Default is `localhost:8563`.
+* *EXASOL_USER* and *EXASOL_PASSWORD*: user and password of the Exasol account. Default is `sys` and `exasol`.
+* *EXAQUERY_HOST*: address where to bound the Exaquery server's instance. Default is `0.0.0.0`.
+* *EXAQUERY_PORT*: port to bound the Exaquery server's instance. Default is `50020`.
 
-The problem is that I have Webpack setup to package CSS for the browser but we're using Sass/Compass before Webpack. On the first run, the `public/main.css` file is empty as Sass hasn't done its thing yet so Webpack requires an empty file and no styles show up in the browser. On the next start of `gulp watch` the `public/main.css` file *has* been compiled by Sass so styles will now show up in the browser.
+## Production
 
-# Production build
-To build for production, simply run `gulp build`
+Create a settings file in the `settings` directory, then build the docker image:
 
-# Demo
-Try out the example app included with this quickstart: http://kyleamathews.github.io/coffee-react-quickstart/
+```bash
+docker build -t exaquery-server --build-arg settings=settings.<custom_setting> .
+```
 
+Run the docker image with:
 
+```bash
+docker run -d -p 50020:50020 --name exaquery-server exaquery-server
+```
+
+## Client
+
+Client's code is in the `src/scripts` directory, `cd` into it to work on the frontend code.
+
+### Install dependencies
+
+To install the dependency for the client run:
+
+```bash
+bundle install
+yarn install
+```
+
+This will install the respective NPM and Ruby Gem dependencies.
+
+You'll also need to have `gulp` installed globally to run the coffeescript gulpfile:
+
+```bash
+npm install -g gulp
+```
+
+### Development
+
+Jus run:
+
+```bash
+gulp watch
+```
+
+This will watch the directory's content and build on changes and place the built `.css` and `.js` files in the `public` directory. It'll serve everything in the `public` directory at http://localhost:8080.
+
+### Production build
+
+To build for production, simply run:
+
+```bash
+gulp build
+```
