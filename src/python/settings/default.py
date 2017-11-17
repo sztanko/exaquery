@@ -12,4 +12,4 @@ EXASOL_USER = os.environ.get('EXASOL_USER', 'sys')
 EXASOL_PASSWORD = os.environ.get('EXASOL_PASSWORD', 'exasol')
 
 EXAQUERY_HOST = os.environ.get('EXAQUERY_HOST', '0.0.0.0')
-EXAQUERY_PORT = int(os.environ.get('EXAQUERY_PORT', 50020))
+EXAQUERY_PORT = int(os.environ.get('EXAQUERY_PORT', 5012))

@@ -24,6 +24,8 @@ ADD ./ .
 ARG settings="settings"
 ENV SETTINGS=$settings
 
-EXPOSE 50020
+EXPOSE 5012
+
+run apk add perl
 
 CMD ["python3", "server.py"]

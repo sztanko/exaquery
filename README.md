@@ -27,7 +27,7 @@ where `env_vars` is a list of environment variables listed here:
 * *EXASOL_HOST*: hostname of the Exasol instance including the port numeber. Default is `localhost:8563`.
 * *EXASOL_USER* and *EXASOL_PASSWORD*: user and password of the Exasol account. Default is `sys` and `exasol`.
 * *EXAQUERY_HOST*: address where to bound the Exaquery server's instance. Default is `0.0.0.0`.
-* *EXAQUERY_PORT*: port to bound the Exaquery server's instance. Default is `50020`.
+* *EXAQUERY_PORT*: port to bound the Exaquery server's instance. Default is `5012`.
 
 ## Production
 
@@ -40,7 +40,7 @@ docker build -t exaquery-server --build-arg settings=settings.<custom_setting> .
 Run the docker image with:
 
 ```bash
-docker run -d -p 50020:50020 --name exaquery-server exaquery-server
+docker run -d -p 5012:5012 --name exaquery-server exaquery-server
 ```
 
 ## Client
