@@ -61,12 +61,12 @@ This will install the respective NPM and Ruby Gem dependencies.
 You'll also need to have `gulp` installed globally to run the coffeescript gulpfile:
 
 ```bash
-npm install -g gulp
+yarn global install gulp
 ```
 
 ### Development
 
-Jus run:
+Just run:
 
 ```bash
 gulp watch
