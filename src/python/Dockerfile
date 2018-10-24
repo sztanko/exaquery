@@ -1,7 +1,9 @@
 FROM anapsix/alpine-java:8_server-jre
 
-RUN apk update && apk upgrade
-RUN apk add python3
+RUN apk update \
+    && apk add \
+        python3 \
+        perl
 
 RUN apk add --virtual .exasol curl tar perl \
     && cd /usr/local \
@@ -11,7 +13,6 @@ RUN apk add --virtual .exasol curl tar perl \
 ENV EXAJLOAD_BIN=/usr/local/EXASOL_JDBC-6.0.4/exajload
 ENV PATH=$PATH:/usr/local/EXASOL_JDBC-6.0.4
 
-RUN mkdir /app
 WORKDIR /app
 
 ADD ./requirements.txt .
@@ -25,7 +26,5 @@ ARG settings="settings"
 ENV SETTINGS=$settings
 
 EXPOSE 5012
-
-run apk add perl
 
 CMD ["python3", "server.py"]
