@@ -4,7 +4,7 @@ var webpack = require('webpack');
 module.exports = {
   entry: {
     app: [
-      './src/scripts/router'
+      './src/router'
     ],
   },
   devtool: 'source-map',
@@ -13,7 +13,7 @@ module.exports = {
       filename: "bundle.js",
   },
   resolveLoader: {
-    modulesDirectories: ['..', 'node_modules']
+    modulesDirectories: ['node_modules']
   },
   plugins: [
     new webpack.DefinePlugin({

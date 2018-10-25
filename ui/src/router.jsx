@@ -1,6 +1,6 @@
 // Load css first thing. It gets injected in the <head> in a <style> element by
 // the Webpack style-loader.
-import '../../public/main.css';
+import '../public/main.css';
 
 import React from 'react';
 import App from './app';

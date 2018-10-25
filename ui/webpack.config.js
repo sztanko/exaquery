@@ -5,7 +5,7 @@ module.exports = {
   entry: [
     "webpack-dev-server/client?http://0.0.0.0:8080",
     'webpack/hot/only-dev-server',
-    './src/scripts/router'
+    './src/router'
   ],
   devtool: "source-map",
   debug: true,
