@@ -1,5 +1,7 @@
 var path = require('path');
 var webpack = require('webpack');
+var ProgressBarPlugin = require('progress-bar-webpack-plugin');
+var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -22,6 +24,8 @@ module.exports = {
         NODE_ENV: JSON.stringify("production")
       }
     }),
+    new ProgressBarPlugin(),
+    new CaseSensitivePathsPlugin(),
     new webpack.IgnorePlugin(/vertx/),
     new webpack.IgnorePlugin(/un~$/),
     new webpack.optimize.DedupePlugin(),

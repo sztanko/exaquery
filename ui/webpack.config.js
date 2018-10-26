@@ -1,5 +1,7 @@
 var path = require('path');
 var webpack = require('webpack');
+var ProgressBarPlugin = require('progress-bar-webpack-plugin');
+var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
 module.exports = {
   entry: [
@@ -17,6 +19,9 @@ module.exports = {
     modulesDirectories: ['node_modules']
   },
   plugins: [
+    new ProgressBarPlugin(),
+    new CaseSensitivePathsPlugin(),
+    new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
     new webpack.IgnorePlugin(/vertx/) // https://github.com/webpack/webpack/issues/353
