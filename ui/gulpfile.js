@@ -6,6 +6,7 @@
  */
 const gulp = require('gulp');
 const gutil = require('gulp-util');
+const sequence = require("gulp-sequence");
 const webpack = require("webpack");
 const WebpackDevServer = require("webpack-dev-server");
 const webpackConfig = require("./webpack.config.js");
@@ -120,7 +121,7 @@ gulp.task("webpack-dev-server", function(callback) {
 
 gulp.task('default', () => gulp.start('build'));
 
-gulp.task('build', ['webpack:build', 'css', 'copy-assets']);
+gulp.task('build', sequence(['css', 'copy-assets'], ['webpack:build']));
 
 gulp.task('watch', ['css', 'copy-assets', 'webpack-dev-server'], function() {
   gulp.watch(['src/styles/**'], ['css']);

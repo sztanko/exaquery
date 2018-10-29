@@ -1,10 +1,12 @@
 var path = require('path');
 var webpack = require('webpack');
+var ProgressBarPlugin = require('progress-bar-webpack-plugin');
+var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
 module.exports = {
   entry: {
     app: [
-      './src/scripts/router'
+      './src/router'
     ],
   },
   devtool: 'source-map',
@@ -13,7 +15,7 @@ module.exports = {
       filename: "bundle.js",
   },
   resolveLoader: {
-    modulesDirectories: ['..', 'node_modules']
+    modulesDirectories: ['node_modules']
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -22,6 +24,8 @@ module.exports = {
         NODE_ENV: JSON.stringify("production")
       }
     }),
+    new ProgressBarPlugin(),
+    new CaseSensitivePathsPlugin(),
     new webpack.IgnorePlugin(/vertx/),
     new webpack.IgnorePlugin(/un~$/),
     new webpack.optimize.DedupePlugin(),
