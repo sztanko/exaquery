@@ -1,0 +1,46 @@
+Metadata-Version: 2.0
+Name: pyexasol
+Version: 0.5.1
+Summary: Exasol python driver with extra features
+Home-page: https://github.com/badoo/pyexasol
+Author: Vitaly Markov
+Author-email: wild.desu@gmail.com
+License: UNKNOWN
+Description-Content-Type: UNKNOWN
+Keywords: exasol sql database performance websocket import export
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Topic :: Database
+Requires-Python: >=3.6
+Requires-Dist: websocket-client (>=0.47.0)
+Requires-Dist: rsa
+Provides-Extra: encrypt
+Requires-Dist: pyopenssl (>=17.5.0); extra == 'encrypt'
+Provides-Extra: pandas
+Requires-Dist: pandas (!=0.23.1,>=0.22); extra == 'pandas'
+Provides-Extra: rapidjson
+Requires-Dist: python-rapidjson; extra == 'rapidjson'
+Provides-Extra: ujson
+Requires-Dist: ujson; extra == 'ujson'
+
+
+Exasol python driver with low overhead, fast HTTP transport and compression.
+
+Main features
+------
+
+-  Based on WebSocket protocol;
+-  Optimized for minimum overhead;
+-  Easy integration with pandas via HTTP transport;
+-  Compression to reduce network bottleneck;
+
+PyEXASOL requires Python 3.6+.
+
+Driver does not use ODBC. Driver does not strictly follow DB-API 2.0 in favor of Exasol-specific features.
+
+Please read "Best practices" manual page to learn how to use PyEXASOL with maximum efficiency.
+
+

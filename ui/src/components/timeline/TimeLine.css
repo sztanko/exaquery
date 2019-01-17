@@ -1,0 +1,124 @@
+
+.TimeLine{
+    /*border: 1px solid black; */
+    /*font-family: 'Times New Roman', Times, serif */
+    
+}
+
+.BackgroundRect{
+    background-color: white;
+    fill: white;
+}
+
+.event{
+    stroke: white;
+    stroke-width: 0.3;    
+    fill: #efefef;
+    --TRANSACTION: #8c564b; /*COMMIT, ROLLBACK */
+    --DQL: #2ca02c; /*SELECT */
+    --OTHER: #7f7f7f; /*OPEN SCHEMA, ALTER SESSION, FLUSH STATISTICS, DESCRIBE, NO OP */
+    --DML: #bcbd22; /*TRUNCATE TABLE, INSERT, DELETE, IMPORT, EXPORT, MERGE, UPDATE */
+    --DDL: #ff7f0e; /*DROP TABLE, CREATE TABLE, DROP VIEW, CREATE VIEW */
+    --UNKNOWN: #17becf; /*NOT SPECIFIED */
+    --DCL: #e377c2; /*GRANT OBJECT */
+    cursor: pointer;
+}
+
+
+.event:hover{
+    stroke: black;
+    stroke-width: 1;
+}
+
+.event.noflag{
+    stroke: red;
+    stroke-width: 2;
+    /*stroke-dasharray: 1 1; */
+}
+
+.timeLines line{
+    stroke: #CCC;
+    stroke-width: 0.5;
+    stroke-dasharray: 4 3;
+}
+
+.event.EVENT_GROUP{
+    /*fill: url(#hashes); */
+    fill: #CCCCFF;
+    stroke: #ccc;
+    stroke-width: 5;
+    stroke-dasharray: 1 1;
+  
+}
+
+.event.noflag.EVENT_GROUP{
+    /*fill: url(#hashes); */
+    fill: none;
+    stroke: #FF9999;
+    stroke-width: 5;
+    stroke-dasharray: 1 1;
+  
+}
+
+
+.event.EVENT_GROUP:hover{
+    /*fill: url(#hashes); */
+    stroke: black;  
+}
+
+.event.noflag:hover{
+    stroke: red;
+    stroke-width: 5;
+}
+
+
+
+.event.TRANSACTION{
+    fill: var(--TRANSACTION);
+}
+.event.DQL{
+    fill: var(--DQL);
+}
+.event.OTHER{
+    fill: var(--OTHER);
+}
+.event.DML{
+    fill: var(--DML);
+}
+.event.DDL{
+    fill: var(--DDL);
+}
+.event.UNKNOWN{
+    fill: var(--UNKNOWN);
+}
+.event.DCL{
+    fill: var(--DCL);
+}
+
+.group{
+    stroke: grey;
+    stroke-width: 0.5;    
+    fill: #efefef; 
+}
+
+.group text{
+    stroke: none;
+    fill: black;
+    font-size: 10px;
+}
+
+.group line {
+    stroke:#DDDDDD;
+    stroke-width: 1;
+    stroke-dasharray: 2 1;
+}
+
+.hashLine{
+    stroke-width: 1;
+    stroke: white;
+    
+}
+
+.hashBackground{
+    fill: lightblue;
+}

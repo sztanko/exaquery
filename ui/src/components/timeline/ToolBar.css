@@ -1,0 +1,26 @@
+.ToolBar {
+  /*height: 30px; */
+  /*border: 1px solid black; */
+  padding: 10px;
+}
+
+.quickLinks {
+  float: right;
+  /*display: inline-block; */
+  list-style: none;
+}
+.quickLinks li{
+    padding: 3px;
+}
+.quickLinks a {
+ 
+}
+
+.quickLinks a::after {
+  content: " | ";
+  color: black;
+  text-decoration: none;
+}
+.quickLinks a:last-child:after {
+  content: "";
+}

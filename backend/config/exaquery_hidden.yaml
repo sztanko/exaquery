@@ -1,0 +1,39 @@
+name: exaquery
+granularity: 150
+threshold: 5
+base:
+  queries: |
+    select
+        concat(ss.user_name,' ', ss.host,' ', os_user) as gr,
+        concat(sq.session_id, '_', sq.stmt_id) as box_id,
+        sq.command_class as modifier,
+        sq.success as flag,
+        coalesce(sq.cpu_avg,0) as metric,
+        posix_time(sq.start_time) as start_time,
+        posix_time(coalesce(sq.stop_time, now())) as stop_time
+    from
+        "$EXA_AUDIT_SQL" sq
+        left join "$EXA_STATS_AUDIT_SESSIONS" ss on ss.session_id = sq.session_id
+      -- where posix_time(sq.start_time)<{{ stop_time }} and posix_time(coalesce(sq.stop_time, now()))>{{ start_time }}
+  sessions: |
+      select
+          concat(ss.user_name,' ', ss.host,' ', os_user) as gr,
+          concat(ss.session_id, '_s') as box_id,
+          'SESSION_START' as modifier,
+          ss.success as flag,
+          0 as metric,
+          posix_time(ss.login_time) as start_time,
+          posix_time(ss.login_time)+0.1 as stop_time
+      from 
+          "$EXA_STATS_AUDIT_SESSIONS" ss
+      where posix_time(ss.login_time) >= {{start_time}} and posix_time(ss.login_time) < {{stop_time}}
+  base: |
+      select * from sessions
+      UNION ALL 
+      select * from queries
+info:
+  info: |
+    select sq.*, ss.*
+        from EXA_DBA_AUDIT_SQL 
+            left join EXA_DBA_AUDIT_SESSIONs ss on ss.session_id = sq.session_id
+    where ss.session_id={{}}
