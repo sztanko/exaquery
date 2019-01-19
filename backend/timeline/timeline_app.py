@@ -80,6 +80,7 @@ def get(config_name):
     log.info("Getting data for config %s", config_name)
     start_time = float(request.args.get("from", time.time() - DEFAULT_TIME))
     stop_time = float(request.args.get("to", time.time()))
+    q = (request.args.get("q", "") or "").lower()
     if "." in config_name:
         abort(404)
     params = config.get(config_name)
@@ -88,6 +89,7 @@ def get(config_name):
         abort(404)
     params["start_time"] = start_time
     params["stop_time"] = stop_time
+    params["q"] = q
     q = gen_export(
         params.get("base"),
         start_time,
@@ -95,10 +97,11 @@ def get(config_name):
         params.get("granularity", DEFAULT_GRANULARITY),
         params.get("threshold", DEFAULT_THRESHOLD),
         params,
+
     )
     log.info(q)
     t0 = time.time()
-    # execute("FLUSH STATISTICS")
+    execute("FLUSH STATISTICS")
     result = execute(q)
     t1 = time.time()
     log.info("Retrieved %d results in %.03f sec", len(result), (t1 - t0))

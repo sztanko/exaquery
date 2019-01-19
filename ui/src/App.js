@@ -6,32 +6,25 @@ import "./App.css";
 import TimeLine from "./components/timeline/TimeLine";
 import Popup from "./components/timeline/Popup";
 import ToolBar from "./components/timeline/ToolBar";
-import QueryInfo from "./components/exaquery/QueryInfo";
 
-const API = process.env.REACT_APP_API_URL; //"/api/exaquery/"; //http://127.0.0.1:5000
-
-console.log(
-  `API is ${API}, env is ${
-    process.env.NODE_ENV
-  }, env var is ${"REACT_APP_API_URL_" + process.env.NODE_ENV}`
-);
 class App extends Component {
   state = {
     data: [],
     infoData: {},
     lastUpdate: new Date(0),
-    isLoading: false
+    isLoading: false,
+    q: ""
   };
 
   constructor() {
     super();
-    this.loadEventsDelayed = _.debounce(this.loadEvents.bind(this), 2000);
+    this.loadEventsDelayed = _.debounce(this.loadEvents.bind(this), 1000);
     this.updateScaleDelayed = _.debounce(this.updateScale.bind(this), 100);
   }
 
   onChange(start_time, stop_time) {
     this.updateScaleDelayed(start_time, stop_time);
-    this.loadEventsDelayed(start_time, stop_time);
+    this.loadEventsDelayed(start_time, stop_time, this.state.q);
   }
 
   changeUrl(newParams) {
@@ -47,6 +40,7 @@ class App extends Component {
   }
 
   errorHandler(e) {
+    this.setState({ isLoading: false });
     console.error(`could not load data`);
     console.error(e);
     window.alert("Could not load data");
@@ -71,18 +65,21 @@ class App extends Component {
     this.setState({ lastUpdate: new Date() });
   }
 
-  loadEvents(start_time, stop_time) {
+  onChangeSearch = q => {
+    this.setState({ q: q });
+    const [start_ts, stop_ts] = this.getTimes();
+    this.loadEventsDelayed(start_ts, stop_ts, q);
+  };
+
+  loadEvents(start_time, stop_time, q) {
     const window = (stop_time - start_time) / 4;
     const start_ts_window = start_time - window;
     const stop_ts_window = stop_time + window;
     const toleranceThreshold =
-      (this.state.lastLoadedStopTime - this.state.lastLoadedStartTime) / 20;
-    console.log("Threshold is " + toleranceThreshold + " sec");
-    console.log([
-      Math.abs(start_time - this.state.lastLoadedStartTime),
-      Math.abs(stop_time - this.state.lastLoadedStopTime)
-    ]);
+      (this.state.lastLoadedStopTime - this.state.lastLoadedStartTime) / 40;
+
     if (
+      this.state.last_q === q &&
       Math.abs(start_time - this.state.lastLoadedStartTime) <
         toleranceThreshold &&
       Math.abs(stop_time - this.state.lastLoadedStopTime) < toleranceThreshold
@@ -91,7 +88,9 @@ class App extends Component {
       console.log("Change not significant enough to load new data");
       return;
     }
-    const url = `${API}?from=${start_ts_window}&to=${stop_ts_window}`;
+    const url = `${
+      this.props.api
+    }?from=${start_ts_window}&to=${stop_ts_window}&q=${q || ""}`;
     if (this.state.isLoading) {
       console.log("Already loading data, can't cancel it");
       return;
@@ -115,7 +114,8 @@ class App extends Component {
           lastUpdate: lastUpdate,
           isLoading: false,
           lastLoadedStartTime: start_time,
-          lastLoadedStopTime: stop_time
+          lastLoadedStopTime: stop_time,
+          last_q: q
         });
       })
       .catch(this.errorHandler);
@@ -124,10 +124,11 @@ class App extends Component {
   openPopup(box_id, e) {
     //console.log(e.pageY)
     //console.log(e.clientY)
+
     const mouse_x = e.clientX;
     const max_x = window.innerWidth / 2;
     const left = mouse_x < max_x ? max_x + 10 : 10;
-    const top = e.pageY;
+    const top = e.pageY - e.clientY + 80;
     const [from_ts, to_ts] = this.getTimes();
 
     this.changeUrl({
@@ -143,7 +144,7 @@ class App extends Component {
 
   loadPopup(box_id) {
     console.log(box_id);
-    const url = `${API}info?id=${box_id}`;
+    const url = `${this.props.api}info?id=${box_id}`;
     this.setState({ infoData: {}, infoLoading: true });
     fetch(url)
       .then(responsePromise => {
@@ -179,7 +180,13 @@ class App extends Component {
     return (
       <div className="App">
         {isLoading}
-        <ToolBar onClick={onChange}/>
+        <ToolBar
+          changeTs={onChange}
+          from_ts={start_ts}
+          to_ts={stop_ts}
+          q={this.state.q}
+          onChangeSearch={this.onChangeSearch}
+        />
         <TimeLine
           width={width}
           start_ts={start_ts}
@@ -195,7 +202,7 @@ class App extends Component {
           left={this.state.popupLeft}
           top={this.state.popupTop}
         >
-          <QueryInfo data={this.state.infoData} />
+          <this.props.popupContent data={this.state.infoData} />
         </Popup>
       </div>
     );

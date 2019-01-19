@@ -1,4 +1,4 @@
-export const GROUP_LIST_WIDTH = 300;
+export const GROUP_LIST_WIDTH = 350;
 export const CHANNEL_HEIGHT = 10;
 export const CHANNEL_PADDING = 2;
 export const GROUP_PADDING = 3;

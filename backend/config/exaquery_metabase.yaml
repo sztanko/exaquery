@@ -1,6 +1,6 @@
-name: exaquery
-granularity: 150
-threshold: 5
+name: exaquery_metabase
+granularity: 200
+threshold: 10
 base:
   queries: |
     select
@@ -18,11 +18,14 @@ base:
         where sq.start_time < from_posix_time({{ stop_time }}) and sq.stop_time >= from_posix_time({{ start_time }})
         and (ss.logout_time is null or ss.logout_time >= from_posix_time({{start_time}})) 
         and ss.login_time <= from_posix_time({{stop_time}})
+        {% if q  %}
+        and (LOWER(sq.sql_text) LIKE '%{{q}}%' or LOWER(sq.error_text) LIKE '%{{q}}%')
+        {% endif %}
   sessions: |
       select
           concat(ss.user_name,' ', ss.host,' ', os_user) as gr,
-          concat('SESSION_START', '_', coalesce(ss.session_id, cast(random(1000000000, 10000000000) as int)), '_0') as box_id,
-          'SESSION_START' as modifier,
+          concat('SESSIONSTART', '_', coalesce(ss.session_id, cast(random(1000000000, 10000000000) as int)), '_0') as box_id,
+          'SESSIONSTART' as modifier,
           ss.success as flag,
           0 as metric,
           posix_time(ss.login_time) as start_time,
@@ -30,6 +33,9 @@ base:
       from 
           EXA_DBA_AUDIT_SESSIONS ss
       where ss.login_time between from_posix_time({{start_time}}) and from_posix_time({{stop_time}})
+      {% if q  %}
+        and (ss.error_text LIKE '%{{q}}%')
+        {% endif %}
   base: |
       select * from sessions
       UNION ALL 
@@ -43,12 +49,17 @@ info:
             left join EXA_DBA_AUDIT_SESSIONS ss on ss.session_id = sq.session_id
     where 
         ss.session_id={{box_id.split("_")[1]}} 
-        and sq.stmt_id={{box_id.split("_")[2]}} 
-        AND COMMAND_CLASS='{{box_id.split("_")[0]}}'
+        {% if box_id.split("_")[0] != 'SESSIONSTART' %}
+            and sq.stmt_id={{box_id.split("_")[2]}} 
+            AND COMMAND_CLASS='{{box_id.split("_")[0]}}'
+        {% endif %}
+    order by sq.session_id, sq.stmt_id
   profile: |
     SELECT *
         FROM "$EXA_PROFILE_LAST_DAY"
         WHERE session_id={{box_id.split("_")[1]}}
-            AND stmt_id ={{box_id.split("_")[2]}}
+            {% if box_id.split("_")[0] != 'SESSIONSTART' %}
+                AND stmt_id ={{box_id.split("_")[2]}}
+                {% endif %}
             
         ORDER BY part_id ASC

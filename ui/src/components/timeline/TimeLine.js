@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import "./TimeLine.css";
+import "./TimeLine.scss";
 import addChannelInfo from "../../modules/ChannelBuilder";
 import ChannelSpace from "./ChannelSpace";
 import GestureHandler from "./GestureHandler";
@@ -43,6 +43,7 @@ function GroupList(props) {
   return groups;
 }
 
+
 class TimeLine extends Component {
   static defaultProps = {
     eventRenderer: DefaultEventRenderer,
@@ -66,7 +67,7 @@ class TimeLine extends Component {
     const width = this.props.stop_ts - this.props.start_ts; // time in sec
     const new_width = width / zoom; // new time in sec
     const new_offset = (offset / (this.props.width - GROUP_LIST_WIDTH)) * width;
-    
+
     this.props.onChange(
       this.props.start_ts + new_offset,
       this.props.start_ts + new_width + new_offset
@@ -84,22 +85,19 @@ class TimeLine extends Component {
         <svg width={this.props.width} height={total_height}>
           <defs>
             <pattern
-              id="hashes"
+              id="event_group"
               patternUnits="userSpaceOnUse"
-              x="0"
-              y="0"
               width="2"
-              height="2"
+              height="6"
             >
-              <rect
-                className="hashBackground"
+              <image
+                xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAGBAMAAAAbCVIBAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAA9QTFRFgICAAAAAgICAgICAgICA6umgPgAAAAV0Uk5T/wBcTPJi1oXQAAAAFElEQVR4nGNgZGBkUGQwZHBkYAQAAsAAl+99wQ8AAAAASUVORK5CYII="
+                //xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAGBAMAAAAbCVIBAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAA9QTFRFgICAAAAAgICAgICAgICA6umgPgAAAAV0Uk5T/wC3mPIiNbqKAAAAFElEQVR4nGNgZGBkUGQwZHBkYAQAAsAAl+99wQ8AAAAASUVORK5CYII="
                 x="0"
                 y="0"
-                width="3"
-                height="3"
+                width="2"
+                height="6"
               />
-              <line className="hashLine" x1="0" y1="0" x2="0" y2="3" />
-              <line className="hashLine" x1="0" y1="0" x2="2" y2="0" />
             </pattern>
           </defs>
 
@@ -126,7 +124,6 @@ class TimeLine extends Component {
             <GroupList groups={groups} width={this.props.width} />
           </g>
         </svg>
-        
       </div>
     );
   }

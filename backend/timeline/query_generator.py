@@ -22,6 +22,7 @@ def gen_export(
                 where 
                     start_time<'{stop_time}'
                     and stop_time>'{start_time}'
+            order by null
         ),
         -- some transformations, for convenience reasons
         base_with_time_unit as (

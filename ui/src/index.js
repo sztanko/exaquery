@@ -2,15 +2,26 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
-//import * as serviceWorker from "./serviceWorker";
+import "./components/exaquery/event.scss";
+import QueryInfo from "./components/exaquery/QueryInfo";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-//import loggerPlugin from 'router5/plugins/logger'
-//import browserPlugin from 'router5/plugins/browser'
+
+const API = process.env.REACT_APP_API_URL; //"/api/exaquery/"; //http://127.0.0.1:5000
+
+console.log(
+  `API is ${API}, env is ${
+    process.env.NODE_ENV
+  }, env var is ${"REACT_APP_API_URL_" + process.env.NODE_ENV}`
+);
+
+function ExaQueryApp(props){
+  return <App {...props} popupContent={QueryInfo} api={API}/>
+}
 
 const AppRouter = () => (
   <Router>
     <div>
-      <Route path="/:from_ts?/:to_ts?/:id?" component={App} />
+      <Route path="/:from_ts?/:to_ts?/:id?" component={ExaQueryApp} />
     </div>
   </Router>
 );
@@ -18,8 +29,3 @@ const AppRouter = () => (
 //console.log(AppWithRouter);
 
 ReactDOM.render(<AppRouter />, document.getElementById("root"));
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-//serviceWorker.unregister();

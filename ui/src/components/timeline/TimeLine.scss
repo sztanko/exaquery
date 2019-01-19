@@ -1,0 +1,45 @@
+@import 'constants.scss';
+
+
+.TimeLine{
+    /*border: 1px solid black; */
+    /*font-family: 'Times New Roman', Times, serif */
+    
+}
+
+
+
+.timeLines line{
+    stroke: #CCC;
+    stroke-width: 0.5;
+    stroke-dasharray: 4 3;
+}
+
+
+.group{
+    stroke: grey;
+    stroke-width: 0.5;    
+    fill: $background; 
+}
+
+.group text{
+    stroke: none;
+    fill: black;
+    font-size: 10px;
+}
+
+.group line {
+    stroke:#DDDDDD;
+    stroke-width: 1;
+    stroke-dasharray: 2 1;
+}
+
+.hashLine{
+    stroke-width: 1;
+    stroke: white;
+    
+}
+
+.hashBackground{
+    fill: lightblue;
+}

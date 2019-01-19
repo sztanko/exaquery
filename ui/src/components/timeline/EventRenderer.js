@@ -11,11 +11,11 @@ function EventRenderer(data, scaleX, onEventClick) {
   let width = scaleX(data.stop_time) - x;
   let height = CHANNEL_HEIGHT - 2 * CHANNEL_PADDING;
   const cls = `event ${data.modifier} ${data.flag === 1 ? "flag" : "noflag"}`;
-  const onClick = (e) => {
-     // console.log("CLickkkk")
-     onEventClick(data.box_id, e);
-  };
-  //console.log(cls);
+  let onClick = e => {};
+  if (data.modifier !== "EVENT_GROUP")
+    onClick = e => {
+      onEventClick(data.box_id, e);
+    };
   return (
     <rect
       vectorEffect="non-scaling-stroke"
@@ -28,7 +28,6 @@ function EventRenderer(data, scaleX, onEventClick) {
       onClick={onClick}
     />
   );
-  // `Group: ${data.group}, Offset: ${data.offset}, channel: ${data.channel}`)}
 }
 
 export default EventRenderer;

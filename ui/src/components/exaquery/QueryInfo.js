@@ -1,6 +1,6 @@
 import React from "react";
 import moment from "moment-es6";
-import m from "moment-precise-range-plugin";
+import "moment-precise-range-plugin";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 import "./QueryInfo.css";
@@ -8,7 +8,7 @@ import "./QueryInfo.css";
 import _ from "lodash";
 
 
-const FIELDS = { SESSION_ID: { title: "Session id", component: null } };
+//const FIELDS = { SESSION_ID: { title: "Session id", component: null } };
 
 function writePre(query) {
   if (query) {
@@ -253,7 +253,7 @@ function showInfo(props) {
   if (_.isEmpty(data)) {
     return <div>Loading info</div>;
   }
-  if (_.size(data.info) == 0) {
+  if (_.size(data.info) === 0) {
     return (
       <div>
         No info. This is a group of queries. Zoom in to get individual

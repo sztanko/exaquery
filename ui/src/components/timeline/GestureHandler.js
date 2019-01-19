@@ -1,9 +1,22 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
+import "./GestureHandler.css";
+
+function TimeMarker(props) {
+  return (
+    <line
+      x1={props.x}
+      y1={0}
+      x2={props.x}
+      y2={10000}
+      className="TimeMarker"
+    />
+  );
+}
 
 class GestureHandler extends Component {
-  state = { x: 0, zoom: 1, i: 0 };
+  state = { x: 0, zoom: 1, i: 0, mousePos: null };
 
   static defaultProps = {};
 
@@ -18,10 +31,18 @@ class GestureHandler extends Component {
     return [zoom, newOffset];
   }
 
+  onMouseMove = e => {
+    const rect = ReactDOM.findDOMNode(
+      this.refs["BackgroundRect"]
+    ).getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    this.setState({ mousePos: x });
+  };
+
   _onWheel = e => {
     const absX = Math.abs(e.deltaX);
     const absY = Math.abs(e.deltaY);
-    console.log(e.ctrlKey)
+    // console.log(e.ctrlKey)
     if (!e.ctrlKey && (absX < 1 || absY / absX >= 2)) {
       return;
     }
@@ -33,7 +54,7 @@ class GestureHandler extends Component {
       const x = e.clientX - rect.left; //x position within the element.
 
       const zoomFactor = 1 - e.deltaY / 100;
-      
+
       const [zoom, new_offset] = this.rescale(
         this.state.zoom,
         this.state.x,
@@ -58,7 +79,11 @@ class GestureHandler extends Component {
       .x},0)`;
 
     return (
-      <g className="GestureContainer" onWheel={this._onWheel}>
+      <g
+        className="GestureContainer"
+        onWheel={this._onWheel}
+        onMouseMove={this.onMouseMove}
+      >
         <rect
           x="0"
           y="0"
@@ -67,13 +92,11 @@ class GestureHandler extends Component {
           className="BackgroundRect"
           ref="BackgroundRect"
         />
-        <g
-          className="GestureHandler"
-          
-          transform={transform}
-        >
+        <TimeMarker x={this.state.mousePos} height="100%" />
+        <g className="GestureHandler" transform={transform}>
           {this.props.children}
         </g>
+        
       </g>
     );
   }
