@@ -16,7 +16,7 @@ pyaml==18.11.0
 pyasn1==0.4.4
 pyexasol==0.5.1
 pylint==2.2.2
-PyYAML==3.13
+PyYAML>=4.2b1
 rsa==4.0
 six==1.12.0
 toml==0.10.0
