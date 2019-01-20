@@ -13,12 +13,12 @@ Use touchpad's pinch & scroll functionality to zoom and move:
 The easiest way to run the docker image:
 
 ```shell
-docker run -i -t -e HOST=<exasol_host:port> -e USER=<user> -e PASSWORD=<password> -p 5000:5000  sztanko/exaquery:latest
+docker run -e HOST=<exasol_host:port> -e USER=<user> -e PASSWORD=<password> -p 5000:5000  sztanko/exaquery:latest
 ```
 
 If you are using a tunnelled connection, use `host.docker.internal` as your hostname.
 ```shell
-docker run -i -t -e HOST=host.docker.internal:9000 -e USER=sys  -e PASSWORD=xxxx -p 5000:5000  sztanko/exaquery:latest
+docker run -e HOST=host.docker.internal:9000 -e USER=sys  -e PASSWORD=xxxx -p 5000:5000  sztanko/exaquery:latest
 ```
 
 THen just open [http://0.0.0.0:5000] in your Chrome.
