@@ -1,69 +1,47 @@
 # Exaquery
 
+Exaquery is a ui for visualizing the timeline of exasol queries. It also allows you to see detailed (profiling) information on each query.
+
+Use touchpad's pinch & scroll functionality to zoom and move:
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/9c9HCIWPX6w/0.jpg)](https://www.youtube.com/watch?v=9c9HCIWPX6w)
+
+**Warning** UI is tested on Macbook Chrome only. No idea how thiss looks on other browsers.
+
+## Running
+
+The easiest way to run the docker image:
+
+```shell
+docker run -i -t -e HOST=<exasol_host:port> -e USER=<user> -e PASSWORD=<password> -p 5000:5000  sztanko/exaquery:latest
+```
+
+If you are using a tunnelled connection, use `host.docker.internal` as your hostname.
+```shell
+docker run -i -t -e HOST=host.docker.internal:9000 -e USER=sys  -e PASSWORD=xxxx -p 5000:5000  sztanko/exaquery:latest
+```
+
+THen just open [http://0.0.0.0:5000] in your Chrome.
+
+Any user that can `FLUSH STATISTICS` and with `select any dictionary` privilege can be used for the project. App is not sending to third party server/recording/logging any information. Neither is writes any changes to the database.
+
 ## Server
 
-Server's code is in the `src/python` directory, `cd` into it to work on the backend code.
+Server's code is written in Python 3. It is located in the `backennd` directory, `cd` into it to work on the backend code.
 
 ### Install dependencies
 
-To install the server's dependencies run:
+Follow DOCKERFILE instruction for installing
 
 ```shell
+cd backend
 pip install -r requirements.txt
 ```
 
-### Development
-
-To run the local server for development execute:
-
-```shell
-<env_vars> python server.py
-```
-
-where `env_vars` is a list of environment variables listed here:
-
-- _DEBUG_: enables debug mode if set to `True` or `1`. Default is off.
-- _EXAJLOAD_BIN_: full path including the filename of the `exajload` binary. Default is `/usr/local/bin/exajload`.
-- _EXASOL_HOST_: hostname of the Exasol instance including the port numeber. Default is `localhost:8563`.
-- _EXASOL_USER_ and _EXASOL_PASSWORD_: user and password of the Exasol account. Default is `sys` and `exasol`.
-- _EXAQUERY_HOST_: address where to bound the Exaquery server's instance. Default is `0.0.0.0`.
-- _EXAQUERY_PORT_: port to bound the Exaquery server's instance. Default is `5012`.
-
-## Production
-
-Create a settings file in the `settings` directory, then build the docker image:
-
-```shell
-docker build -t exaquery-server --build-arg settings=settings.<custom_setting> .
-```
-
-Run the docker image with:
-
-```shell
-docker run -d -p 5012:5012 --name exaquery-server exaquery-server
-```
 
 ## Client
 
-Client's code is in the `src/scripts` directory, `cd` into it to work on the frontend code.
-
-### Install dependencies
-
-To install the dependency for the client run:
-
-```shell
-cd ui/
-bundle install
-yarn install
-```
-
-This will install the respective NPM and Ruby Gem dependencies.
-
-You'll also need to have `gulp` installed globally to run the coffeescript gulpfile:
-
-```shell
-yarn global install gulp
-```
+Client's code is in the `ui` directory, `cd` into it to work on the frontend code.
 
 ### Development
 
@@ -71,25 +49,17 @@ Just run:
 
 ```shell
 cd ui/
-gulp watch
+yarn start
 ```
 
-This will watch the directory's content and build on changes and place the built `.css` and `.js` files in the `public` directory. It'll serve everything in the `public` directory at http://localhost:8080.
+The frontend is based on Facebook's [Create React App](https://facebook.github.io/create-react-app/).
+
 
 ### Production build
 
 To build for production, simply run:
 
 ```shell
-gulp build
-```
-
-### Production run
-
-To run the UI and the serve ron production use [Docker Compose](https://docs.docker.com/compose/):
-
-```shell
-settings=<path_to_server_settings> docker-compose up --build
-```
-
-where the `settings` environmental variable pionts to the server settings to use as a Python full package name relative to the `python` directory.
+cd ui
+yarn build
+```s
