@@ -1,0 +1,65 @@
+name: exaquery
+granularity: 150
+threshold: 10
+base:
+  queries: |
+    select
+        concat(ss.user_name,' ', ss.host,' ', os_user) as gr,
+        concat(sq.command_class, '_', coalesce(sq.session_id, cast(random(1000000000, 10000000000) as int)), '_', sq.stmt_id) as box_id,
+        sq.command_class as modifier,
+        sq.success as flag,
+        coalesce(sq.cpu, 0) as metric,
+        posix_time(sq.start_time) as start_time,
+        posix_time(sq.stop_time) as stop_time
+    from
+        EXA_DBA_AUDIT_SQL sq
+        left join EXA_DBA_AUDIT_SESSIONS ss on ss.session_id = sq.session_id
+        where sq.start_time < from_posix_time({{ stop_time }}) and sq.stop_time >= from_posix_time({{ start_time }})
+        and (ss.logout_time is null or ss.logout_time >= from_posix_time({{start_time}})) 
+        and ss.login_time <= from_posix_time({{stop_time}})
+        {% if q  %}
+        and (LOWER(sq.sql_text) LIKE '%{{q}}%' or LOWER(sq.error_text) LIKE '%{{q}}%')
+        {% endif %}
+  sessions: |
+      select
+          concat(ss.user_name,' ', ss.host,' ', os_user) as gr,
+          concat('SESSION_START', '_', coalesce(ss.session_id, cast(random(1000000000, 10000000000) as int)), '_0') as box_id,
+          'SESSION_START' as modifier,
+          ss.success as flag,
+          0 as metric,
+          posix_time(ss.login_time) as start_time,
+          posix_time(ss.login_time)+0.1 as stop_time
+      from 
+          EXA_DBA_AUDIT_SESSIONS ss
+      where ss.login_time between from_posix_time({{start_time}}) and from_posix_time({{stop_time}})
+      {% if q  %}
+        and (ss.error_text LIKE '%{{q}}%')
+        {% endif %}
+  base: |
+      select * from sessions
+      UNION ALL 
+      select * from queries
+info:
+  info: |
+    select sq.*, 
+        ss.login_time, ss.logout_time, ss.user_name, ss.client, ss.driver, ss.encrypted, ss.host, ss.os_user,
+       ss.os_name, ss.success as session_success
+        from EXA_DBA_AUDIT_SQL sq
+            left join EXA_DBA_AUDIT_SESSIONS ss on ss.session_id = sq.session_id
+    where 
+        ss.session_id={{box_id.split("_")[1]}}
+        {% if box_id.split("_")[0] != 'SESSIONSTART' %}
+            and sq.stmt_id={{box_id.split("_")[2]}} 
+            AND COMMAND_CLASS='{{box_id.split("_")[0]}}'
+        {% endif %}
+    order by sq.session_id, sq.stmt_id
+  profile: |
+    SELECT *
+        FROM "$EXA_PROFILE_LAST_DAY"
+        WHERE session_id={{box_id.split("_")[1]}}
+            AND stmt_id ={{box_id.split("_")[2]}}
+             {% if box_id.split("_")[0] != 'SESSIONSTART' %}
+                AND stmt_id ={{box_id.split("_")[2]}}
+                {% endif %}
+            
+        ORDER BY stmt_id, part_id ASC

@@ -1,0 +1,33 @@
+
+.Popup{
+    /*border: 1px solid black; */
+    position: absolute;
+    min-width: 500px;
+    max-width: 45%;
+    border: 1px solid grey;
+    background-color: #EFEFEF;
+    padding: 0px;
+    font-size: 14px;
+    
+    /*overflow-y: scroll; */
+}
+
+.Popup>.controls{
+    text-align: right;
+    padding: 4px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.Popup>.controls:hover{
+    cursor: pointer;
+    background-color: #CCCCCC;
+    
+}
+
+.Popup>.content{
+    padding: 10px;
+    overflow-y: scroll;
+    max-height: 70vh;
+    min-height: 200px;
+}
