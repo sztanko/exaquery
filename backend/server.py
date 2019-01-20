@@ -1,7 +1,7 @@
 from os import environ
 from os.path import abspath
 from werkzeug.wsgi import DispatcherMiddleware
-from flask import Flask, request, send_from_directory, send_file
+from flask import Flask, send_from_directory, send_file
 from timeline.timeline_app import app as timeline_app
 
 # set the project root directory as the static folder, you can set others.
