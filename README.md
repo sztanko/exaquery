@@ -62,4 +62,4 @@ To build for production, simply run:
 ```shell
 cd ui
 yarn build
-```s
+```
