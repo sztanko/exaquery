@@ -6,7 +6,7 @@ Use touchpad's pinch & scroll functionality to zoom and move:
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/9c9HCIWPX6w/0.jpg)](https://www.youtube.com/watch?v=9c9HCIWPX6w)
 
-**Warning** UI is tested on Macbook Chrome only. No idea how thiss looks on other browsers.
+**Warning:** UI is tested on Macbook Chrome only. No idea how thiss looks on other browsers.
 
 ## Running
 
@@ -31,7 +31,7 @@ Server's code is written in Python 3. It is located in the `backennd` directory,
 
 ### Install dependencies
 
-Follow DOCKERFILE instruction for installing
+Follow `Dockerfile` instruction for installing
 
 ```shell
 cd backend
