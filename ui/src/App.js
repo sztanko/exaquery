@@ -7,7 +7,7 @@ import TimeLine from "./components/timeline/TimeLine";
 import Popup from "./components/timeline/Popup";
 import ToolBar from "./components/timeline/ToolBar";
 
-class App extends Component {
+export default class App extends Component {
   state = {
     data: [],
     infoData: {},
@@ -177,6 +177,7 @@ class App extends Component {
     const isLoading = this.state.isLoading ? (
       <div className="loaderIndicator">Loading data...</div>
     ) : null;
+    console.warn(this.props.popupContent)
     return (
       <div className="App">
         {isLoading}
@@ -208,5 +209,3 @@ class App extends Component {
     );
   }
 }
-
-export default App;
