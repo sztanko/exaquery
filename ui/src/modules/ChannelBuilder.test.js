@@ -1,6 +1,5 @@
 import addChannelInfo from "./ChannelBuilder";
-import {expect} from "chai";
-import large_data from "./last_96h.js"
+import { expect } from "chai";
 
 const data = [
   {
@@ -76,9 +75,3 @@ it("enriches data with channel info", () => {
     expect(d.channel).equal(d.expected_channel);
   }
 });
-
-it("enriches real data", () => {
-  // console.log(large_data);  
-  addChannelInfo(large_data);
-  console.log(large_data[large_data.length-1])
-})
