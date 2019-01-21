@@ -20,25 +20,26 @@ COPY backend/ backend/
 COPY run.sh run.sh
 
 # ============================================================================
-# Build
+# Build Python
 # ============================================================================
 
-FROM base AS build
+FROM base AS build_py
 
-# Install packages
-RUN apk --no-cache add \
-    build-base \
-    python3-dev \
-    yarn
-
-# Build Python packages
 WORKDIR /app/backend
 
 COPY --from=code /app/backend/requirements.txt .
 
 RUN pip3 install -r requirements.txt
 
-# Build JavaScript app
+
+# ============================================================================
+# Build JavaScript
+# ============================================================================
+
+FROM base AS build_js
+
+RUN apk --no-cache add yarn
+
 WORKDIR /app/ui
 
 COPY --from=code /app/ui/package.json .
@@ -57,12 +58,12 @@ RUN yarn build
 
 FROM base AS final
 
-# Copy and install Python packages
-COPY --from=build /usr/lib/python3.6/site-packages /usr/lib/python3.6/site-packages
+# Copy Python packages
+COPY --from=build_py /usr/lib/python3.6/site-packages /usr/lib/python3.6/site-packages
 
 # Copy code
 COPY --from=code /app/ .
-COPY --from=build /app/ui/build ui/build
+COPY --from=build_js /app/ui/build ui/build
 
 EXPOSE 5000
 
