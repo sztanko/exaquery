@@ -101,7 +101,7 @@ def get(config_name):
     )
     log.info(q)
     t0 = time.time()
-    execute("FLUSH STATISTICS")
+    # execute("FLUSH STATISTICS") # this is slow
     result = execute(q)
     t1 = time.time()
     log.info("Retrieved %d results in %.03f sec", len(result), (t1 - t0))
