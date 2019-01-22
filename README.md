@@ -1,12 +1,12 @@
 # Exaquery
 
-Exaquery is a ui for visualizing the timeline of exasol queries. It also allows you to see detailed (profiling) information on each query.
+Exaquery is a UI for visualizing the timeline of Exasol queries. It also allows you to see detailed (profiling) information on each query.
 
 Use touchpad's pinch & scroll functionality to zoom and move:
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/9c9HCIWPX6w/0.jpg)](https://www.youtube.com/watch?v=9c9HCIWPX6w)
 
-> **Warning:** UI is tested on Macbook Chrome only. No idea how thiss looks on other browsers.
+> **Warning:** UI is tested on Macbook Chrome only. No idea how this looks on other browsers.
 
 ## Running
 
@@ -32,13 +32,13 @@ docker run \
     sztanko/exaquery:latest
 ```
 
-THen just open [http://0.0.0.0:5000] in your Chrome.
+Then just open [http://0.0.0.0:5000] in your Chrome.
 
-Any user that can `FLUSH STATISTICS` and with `select any dictionary` privilege can be used for the project. App is not sending to third party server/recording/logging any information. Neither is writes any changes to the database.
+Database auditing and (system-wide) profiling needs to be enabled. Any user that can `FLUSH STATISTICS` and with `SELECT ANY DICTIONARY` privilege can be used for the project. App is not sending to third party server/recording/logging any information. Neither it writes any changes to the database.
 
 ## Server
 
-Server's code is written in Python 3. It is located in the `backennd` directory, `cd` into it to work on the backend code.
+Server's code is written in Python 3. It is located in the `backend` directory, `cd` into it to work on the backend code.
 
 ### Install dependencies
 
@@ -87,5 +87,5 @@ yarn build
 To build the Docker container with the backend and UI:
 
 ```shell
-docker build -t exqeury .
+docker build -t exaquery .
 ```
