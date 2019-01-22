@@ -14,6 +14,8 @@ The easiest way to run the docker image:
 
 ```shell
 docker run \
+    -i \
+    -t \
     -e HOST=<exasol_host:port> \
     -e USER=<user> \
     -e PASSWORD=<password> \
@@ -25,6 +27,8 @@ If you are using a tunnelled connection, use `host.docker.internal` as your host
 
 ```shell
 docker run \
+    -i \
+    -t \
     -e HOST=host.docker.internal:9000 \
     -e USER=sys  \
     -e PASSWORD=xxxx \
