@@ -43,10 +43,11 @@ base:
 info:
   info: |
     select sq.*, 
-        ss.login_time, ss.logout_time, ss.user_name, ss.client, ss.driver, ss.encrypted, ss.host, ss.os_user,
+        ss.login_time, coalesce(ss.logout_time, now()), ss.user_name, ss.client, ss.driver, ss.encrypted, ss.host, coalesce(mbu.email, ss.os_user) as os_user,
        ss.os_name, ss.success as session_success
         from EXA_DBA_AUDIT_SQL sq
             left join EXA_DBA_AUDIT_SESSIONS ss on ss.session_id = sq.session_id
+            left join revolut.metabase_users mbu on case when os_user='metabase' then substr(regexp_substr(sql_text, '-- Metabase:: userID: ([0-9]+)'), 23) = mbu.id else FALSE END
     where 
         ss.session_id={{box_id.split("_")[1]}} 
         {% if box_id.split("_")[0] != 'SESSIONSTART' %}

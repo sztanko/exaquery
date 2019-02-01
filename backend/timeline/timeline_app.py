@@ -37,6 +37,7 @@ def get_db():
         debug=False,
         fetch_dict=True,
         socket_timeout=30,
+        compression=True
     )
     log.info("Connected successfully to %s, user %s", dsn, user)
     return db
