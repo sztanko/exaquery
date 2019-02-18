@@ -25,6 +25,10 @@ COPY run.sh run.sh
 
 FROM base AS build_py
 
+RUN apk --no-cache add \
+    build-base \
+    python3-dev
+
 WORKDIR /app/backend
 
 COPY --from=code /app/backend/requirements.txt .
@@ -66,5 +70,7 @@ COPY --from=code /app/ .
 COPY --from=build_js /app/ui/build ui/build
 
 EXPOSE 5000
+
+ENV SETTINGS=settings.prod
 
 CMD ["sh", "./run.sh"]
