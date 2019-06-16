@@ -37,30 +37,22 @@ def get_db():
         debug=False,
         fetch_dict=True,
         socket_timeout=30,
-        compression=True
+        compression=True,
     )
     log.info("Connected successfully to %s, user %s", dsn, user)
     return db
 
 
 def execute(q):
-    connection = g.get("db")
-    if not connection:
-        log.info("NO CONNECTION")
-        connection = get_db()
-        g.db = connection
-    try:
-        stm = connection.execute(q)
-        if stm.rowcount() > 0:
-            return stm.fetchall()
-        return []
-    except:
-        connection = get_db()
-        g.db = connection
-        stm = connection.execute(q)
-        if stm.rowcount() > 0:
-            return stm.fetchall()
-        return []
+    connection = get_db()
+    rows = []
+    stm = connection.execute(q)
+    if stm.rowcount() > 0:
+        rows = stm.fetchall()
+    else:
+        rows = []
+    connection.close()
+    return rows
 
 
 def get_config() -> pyexasol.ExaConnection:
@@ -98,7 +90,6 @@ def get(config_name):
         params.get("granularity", DEFAULT_GRANULARITY),
         params.get("threshold", DEFAULT_THRESHOLD),
         params,
-
     )
     log.info(q)
     t0 = time.time()
