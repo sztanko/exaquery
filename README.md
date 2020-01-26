@@ -19,7 +19,7 @@ docker run \
     -e HOST=<exasol_host:port> \
     -e USER=<user> \
     -e PASSWORD=<password> \
-    -p 5000:5000 \
+    -p 8080:8080 \
     sztanko/exaquery:latest
 ```
 
@@ -32,11 +32,11 @@ docker run \
     -e HOST=host.docker.internal:9000 \
     -e USER=sys  \
     -e PASSWORD=xxxx \
-    -p 5000:5000  \
+    -p 8080:8080  \
     sztanko/exaquery:latest
 ```
 
-Then just open [http://0.0.0.0:5000] in your Chrome.
+Then just open [http://0.0.0.0:8080] in your Chrome.
 
 Database auditing and (system-wide) profiling needs to be enabled. Any user that can `FLUSH STATISTICS` and with `SELECT ANY DICTIONARY` privilege can be used for the project. App is not sending to third party server/recording/logging any information. Neither it writes any changes to the database.
 
@@ -53,6 +53,14 @@ cd backend
 pip install -r requirements.txt
 ```
 
+### Backend development
+
+```shell
+cd backend
+source .env/bin/activate
+HOST=127.0.0.1:9000 USER=sys PASSWORD=exasol python server.py
+```
+
 ## Client
 
 Client's code is in the `ui` directory, `cd` into it to work on the frontend code.
@@ -66,7 +74,7 @@ cd ui
 yarn
 ```
 
-### Development
+### Client development
 
 Just run:
 

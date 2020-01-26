@@ -1,11 +1,12 @@
 import React from "react";
 import moment from "moment-es6";
+import _ from 'lodash';
 import "moment-precise-range-plugin";
 import ReactTable from "react-table";
+import DataTable from "react-data-table-component";
 import "react-table/react-table.css";
-import "./QueryInfo.css";
-
-import _ from "lodash";
+import "./QueryInfo.scss";
+import { duration } from "moment";
 
 
 //const FIELDS = { SESSION_ID: { title: "Session id", component: null } };
@@ -19,7 +20,12 @@ function writePre(query) {
 function showQueryInfo(d) {
   const startTime = moment(d.START_TIME);
   const stopTime = moment(d.STOP_TIME);
-  const now=moment()
+  const adjustedQueryDuration = d.DURATION
+    ? (d.DURATION * d.RESOURCES) / 100
+    : 0;
+  const adjustedStopTime = moment(d.START_TIME);
+  adjustedStopTime.add(adjustedQueryDuration, "seconds");
+  const now = moment();
   return (
     <dl className="queryInfo">
       <dt>Class</dt>
@@ -44,8 +50,13 @@ function showQueryInfo(d) {
       </dd>
       <dt>Duration</dt>
       <dd className="query_duration">
-        <tt>{d.DURATION ? d.DURATION.toLocaleString() : "0"}</tt> seconds
-        ({startTime.preciseDiff(stopTime)})
+        <tt>{d.DURATION ? d.DURATION.toLocaleString() : "0"}</tt> seconds (
+        {startTime.preciseDiff(stopTime)})
+      </dd>
+      <dt>Potential Duration</dt>
+      <dd className="adjusted_query_duration">
+        <tt>{adjustedQueryDuration.toLocaleString()}</tt> seconds (
+        {startTime.preciseDiff(adjustedStopTime)})
       </dd>
       <dt>Row Count</dt>
       <dd className="row_count">
@@ -193,14 +204,17 @@ function showProfiling(p) {
     },
     {
       Header: "Name",
+      id: "name",
       accessor: "PART_NAME"
     },
     {
       Header: "Info",
+      id: "info",
       accessor: "PART_INFO"
     },
     {
       Header: "Object",
+      id: "object",
       accessor: "OBJECT_NAME"
     },
     {
@@ -225,10 +239,113 @@ function showProfiling(p) {
     <ReactTable
       data={p}
       columns={columns}
-      defaultPageSize={200}
+      defaultPageSize={50}
       minRows={0}
-      showPaginationBottom={false}
+      showPaginationBottom={true}
     />
+  );
+}
+
+
+function showProfiling2(p) {
+
+  const durationThreshold =  _(p).map(d => +d.DURATION).max()
+  
+
+  const conditionalRowStyles = [
+    {
+      when: row => +row.DURATION < 0.05 && +row.DURATION < 0.1 * durationThreshold,
+      style: {color: '#555'},
+    },
+    
+    {
+      when: row => +row.DURATION > 0.3,
+      style: {backgroundColor: '#FFF8F8'},
+    },
+    {
+      when: row => +row.DURATION > 1,
+      style: {backgroundColor: '#FFEEEE'},
+    },
+    {
+      when: row => +row.DURATION > 1 && row.REMARKS === 'ExpressionIndex',
+      style: {borderBottom: '#FFC3C3'},
+    },
+    {
+      when: row => durationThreshold>1 && +row.DURATION > 0.5 *durationThreshold,
+      style: {backgroundColor: '#FFC3C3'},
+    },
+    {
+      when: row => durationThreshold>1 && +row.DURATION >= 0.95 * durationThreshold,
+      style: {backgroundColor: '#FFADAD'},
+    },
+    
+  ];
+
+  const columns = [
+    {
+      name: "#",
+      selector: "PART_ID",
+      width: '20px',
+      style: {color: 'grey'},
+      sortable: true
+    },
+    {
+      name: "Time",
+      // id: "duration",
+      selector: d => +d.DURATION,
+      width: '60px',
+      sortable: true
+    },
+    {
+      name: "Name",
+      selector: "PART_NAME",
+      width: '140px',
+      sortable: true
+    },
+    {
+      name: "Info",
+      selector: "PART_INFO",
+      width: '200px',
+      sortable: true
+    },
+    {
+      name: "Object",
+      selector: "OBJECT_NAME",
+      width: '150px',
+      sortable: true
+    },
+    {
+      name: "In",
+      selector: d => +d.IN_ROWS,
+      width: '80px',
+      format: props => (+props.IN_ROWS).toLocaleString(),
+      sortable: true
+      // Cell: props => {props.value.toLocaleString()}
+    },
+    {
+      name: "Out",
+      selector: d => +d.OUT_ROWS,
+      width: '80px',
+      format: props => (+props.OUT_ROWS).toLocaleString(),
+      sortable: true
+      //Cell: props => {props.value.toLocaleString()}
+    },
+    {
+      Header: "Remarks",
+      selector: "REMARKS",
+      sortable: true
+    }
+  ];
+  return (
+    <DataTable
+    title="Profile"
+    columns={columns}
+    data={p}
+    fixedHeader
+    fixedHeaderScrollHeight="500px"
+    conditionalRowStyles={conditionalRowStyles}
+  />
+    
   );
 }
 
@@ -248,7 +365,7 @@ function StmInfo(props) {
 }
 
 function showInfo(props) {
-  console.log(props);
+  // console.log(props);
   const data = props.data;
   if (_.isEmpty(data)) {
     return <div>Loading info</div>;
@@ -264,7 +381,7 @@ function showInfo(props) {
   const profiling = data.profile ? (
     <div className="profile">
       <h2>Profile</h2>
-      {showProfiling(data.profile)}
+      {showProfiling2(data.profile)}
     </div>
   ) : null;
 

@@ -20,7 +20,7 @@ const timeIntervals = [
   { title: "3h", value: 3 * 3600 },
   { title: "6h", value: 6 * 3600 },
   { title: "12h", value: 12 * 3600 },
-  { title: "24h", value: 24 * 3600 },
+  { title: "24h", value: 24 * 3600 }
   // { title: "72h", value: 72 * 3600 }
 ];
 
@@ -32,7 +32,8 @@ class ToolBar extends Component {
     changeTs: PropTypes.func,
     from_ts: PropTypes.number,
     to_ts: PropTypes.number,
-    onChangeSearch: PropTypes.func
+    onChangeSearch: PropTypes.func,
+    onFlushClick: PropTypes.func
   };
 
   onDateChange = value => {
@@ -117,6 +118,7 @@ class ToolBar extends Component {
             />
             Auto Refresh
           </label>
+          <button onClick={this.props.onFlushClick}>Flush statistics</button>
         </div>
       </div>
     );

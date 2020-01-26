@@ -69,7 +69,7 @@ COPY --from=build_py /usr/lib/python3.6/site-packages /usr/lib/python3.6/site-pa
 COPY --from=code /app/ .
 COPY --from=build_js /app/ui/build ui/build
 
-EXPOSE 5000
+EXPOSE 8080
 
 ENV SETTINGS=settings.prod
 

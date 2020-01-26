@@ -123,3 +123,15 @@ def get_info(config_name):
     t1 = time.time()
     log.info("Retrieved info in %.03f sec", (t1 - t0))
     return jsonify(result=out)
+
+
+@app.route("/<config_name>/flush", methods=["POST"])
+def flush_statistics(config_name):
+    params = config.get(config_name)
+    if "flush" in params:
+        t0 = time.time()
+        out = execute(params["flush"])
+        t1 = time.time()
+        log.info("Flushed stats in %.03f sec", (t1 - t0))
+        return jsonify(result=out)
+    abort(501)

@@ -1,4 +1,5 @@
 $queryTypes: (
+  RUNNING: #ffb0fc,
   TRANSACTION: #8c564b,
   //COMMIT, ROLLBACK
     DQL: #2ca02c,
@@ -13,5 +14,14 @@ $queryTypes: (
   //NOT SPECIFIED
     DCL: #e377c2,
   //GRANT OBJECT"
-    SESSIONSTART: #fbceb1
+    SESSIONSTART: #fbceb1,
+  User: #8c564b,
+  //COMMIT, ROLLBACK
+    KycTransaction: #2ca02c,
+  //SELECT
+    ComplianceAnalysis: #7f7f7f,
+  //OPEN SCHEMA, ALTER SESSION, FLUSH STATISTICS, DESCRIBE, NO OP
+    Chargeback: #bcbd22,
+  //TRUNCATE TABLE, INSERT, DELETE, IMPORT, EXPORT, MERGE, UPDATE
+    Business: #ff7f0e
 );

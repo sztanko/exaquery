@@ -7,6 +7,8 @@ import TimeLine from "./components/timeline/TimeLine";
 import Popup from "./components/timeline/Popup";
 import ToolBar from "./components/timeline/ToolBar";
 
+const DEFAULT_INITIAL_WINDOW = 600;
+
 export default class App extends Component {
   state = {
     data: [],
@@ -22,9 +24,9 @@ export default class App extends Component {
     this.updateScaleDelayed = _.debounce(this.updateScale.bind(this), 100);
   }
 
-  onChange(start_time, stop_time) {
+  onChange(start_time, stop_time, force) {
     this.updateScaleDelayed(start_time, stop_time);
-    this.loadEventsDelayed(start_time, stop_time, this.state.q);
+    this.loadEventsDelayed(start_time, stop_time, this.state.q, force);
   }
 
   changeUrl(newParams) {
@@ -45,14 +47,15 @@ export default class App extends Component {
     console.error(e);
     window.alert("Could not load data");
   }
-  getTimes() {
+  getCurrentTimeInterval() {
     const now = new Date().getTime() / 1000;
-    const start_ts = +this.props.match.params.from_ts || now - 3600;
+    const start_ts =
+      +this.props.match.params.from_ts || now - DEFAULT_INITIAL_WINDOW;
     const stop_ts = +this.props.match.params.to_ts || now;
     return [start_ts, stop_ts];
   }
   componentDidMount() {
-    const [start_ts, stop_ts] = this.getTimes();
+    const [start_ts, stop_ts] = this.getCurrentTimeInterval();
     this.loadEvents(start_ts, stop_ts);
     if (this.props.match.params.id != null) {
       this.loadPopup(this.props.match.params.id);
@@ -67,11 +70,36 @@ export default class App extends Component {
 
   onChangeSearch = q => {
     this.setState({ q: q });
-    const [start_ts, stop_ts] = this.getTimes();
+    const [start_ts, stop_ts] = this.getCurrentTimeInterval();
     this.loadEventsDelayed(start_ts, stop_ts, q);
   };
 
-  loadEvents(start_time, stop_time, q) {
+  flush = () => {
+    const url = `${this.props.api}flush`;
+
+    if (this.state.isLoading) {
+      console.log("Cannot flush while loading");
+      return;
+    }
+    this.setState({ isLoading: true });
+    fetch(url, { method: "POST" })
+      .then(response => {
+        console.log("Flush successfull");
+        this.setState({ isLoading: false });
+        const [start_time, stop_time] = this.getCurrentTimeInterval();
+        const offset = new Date().getTime() / 1000 - stop_time;
+        console.log("Flushed, now loading new events");
+        this.onChange(
+          start_time + offset,
+          stop_time + offset,
+          this.state.q,
+          true
+        );
+      })
+      .catch(this.errorHandler);
+  };
+
+  loadEvents(start_time, stop_time, q, force) {
     const window = (stop_time - start_time) / 4;
     const start_ts_window = start_time - window;
     const stop_ts_window = stop_time + window;
@@ -79,6 +107,7 @@ export default class App extends Component {
       (this.state.lastLoadedStopTime - this.state.lastLoadedStartTime) / 40;
 
     if (
+      !force &&
       this.state.last_q === q &&
       Math.abs(start_time - this.state.lastLoadedStartTime) <
         toleranceThreshold &&
@@ -118,7 +147,7 @@ export default class App extends Component {
           last_q: q
         });
       })
-      .catch(this.errorHandler);
+      .catch(this.errorHandler.bind(this));
   }
 
   openPopup(box_id, e) {
@@ -129,7 +158,7 @@ export default class App extends Component {
     const max_x = window.innerWidth / 2;
     const left = mouse_x < max_x ? max_x + 10 : 10;
     const top = e.pageY - e.clientY + 80;
-    const [from_ts, to_ts] = this.getTimes();
+    const [from_ts, to_ts] = this.getCurrentTimeInterval();
 
     this.changeUrl({
       from_ts: from_ts,
@@ -164,20 +193,20 @@ export default class App extends Component {
   }
 
   closePopup() {
-    const [from_ts, to_ts] = this.getTimes();
+    const [from_ts, to_ts] = this.getCurrentTimeInterval();
     this.changeUrl({ from_ts: from_ts, to_ts: to_ts, id: null });
   }
 
   render() {
     const width = window.innerWidth;
     const onChange = this.onChange.bind(this);
-    const [start_ts, stop_ts] = this.getTimes();
+    const [start_ts, stop_ts] = this.getCurrentTimeInterval();
     const openPopup = this.openPopup.bind(this);
     const onClose = this.closePopup.bind(this);
     const isLoading = this.state.isLoading ? (
       <div className="loaderIndicator">Loading data...</div>
     ) : null;
-    console.warn(this.props.popupContent)
+    console.warn(this.props.popupContent);
     return (
       <div className="App">
         {isLoading}
@@ -187,6 +216,7 @@ export default class App extends Component {
           to_ts={stop_ts}
           q={this.state.q}
           onChangeSearch={this.onChangeSearch}
+          onFlushClick={this.flush}
         />
         <TimeLine
           width={width}
