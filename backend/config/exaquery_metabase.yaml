@@ -1,6 +1,6 @@
 name: exaquery_metabase
-granularity: 200
-threshold: 10
+granularity: 100
+threshold: 5
 base:
     queries: |
         select

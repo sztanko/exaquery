@@ -70,6 +70,7 @@ function showQueryInfo(d) {
   );
 }
 function showResourceInfo(d) {
+  const hddReadClasses = "hdd_read" + (+d.HDD_READ > 0? " real_read":"")
   return (
     <dl className="resourceInfo">
       <dt>Resources</dt>
@@ -81,7 +82,7 @@ function showResourceInfo(d) {
         <tt>{d.CPU}</tt>
       </dd>
       <dt>HDD Read</dt>
-      <dd className="hdd_read">
+      <dd className={hddReadClasses}>
         <tt>{d.HDD_READ}</tt>
       </dd>
       <dt>HDD Write</dt>
@@ -192,62 +193,6 @@ function showQuery(d) {
 }
 
 function showProfiling(p) {
-  const columns = [
-    {
-      Header: "#",
-      accessor: "PART_ID"
-    },
-    {
-      Header: "Duration",
-      id: "duration",
-      accessor: d => +d.DURATION
-    },
-    {
-      Header: "Name",
-      id: "name",
-      accessor: "PART_NAME"
-    },
-    {
-      Header: "Info",
-      id: "info",
-      accessor: "PART_INFO"
-    },
-    {
-      Header: "Object",
-      id: "object",
-      accessor: "OBJECT_NAME"
-    },
-    {
-      Header: "In",
-      id: "In",
-      accessor: d => +d.IN_ROWS
-      // Cell: props => {props.value.toLocaleString()}
-    },
-    {
-      Header: "Out",
-      id: "Out",
-      accessor: d => +d.OUT_ROWS
-      //Cell: props => {props.value.toLocaleString()}
-    },
-    {
-      Header: "Remarks",
-      accessor: "REMARKS"
-    }
-  ];
-
-  return (
-    <ReactTable
-      data={p}
-      columns={columns}
-      defaultPageSize={50}
-      minRows={0}
-      showPaginationBottom={true}
-    />
-  );
-}
-
-
-function showProfiling2(p) {
 
   const durationThreshold =  _(p).map(d => +d.DURATION).max()
   
@@ -268,7 +213,17 @@ function showProfiling2(p) {
     },
     {
       when: row => +row.DURATION > 1 && row.REMARKS === 'ExpressionIndex',
-      style: {borderBottom: '#FFC3C3'},
+      style: {color: 'red'},
+    },
+    {
+      when: row => { 
+        if(!row.PART_INFO) return false;
+        const in_rows = +row.IN_ROWS;
+        const out_rows = +row.OUT_ROWS;
+        // console.debug(row);
+        return (row.PART_INFO.includes('NL ') && in_rows>100 && out_rows >= in_rows * in_rows / 100)
+      },
+      style: {color: 'red'},
     },
     {
       when: row => durationThreshold>1 && +row.DURATION > 0.5 *durationThreshold,
@@ -380,8 +335,7 @@ function showInfo(props) {
   }
   const profiling = data.profile ? (
     <div className="profile">
-      <h2>Profile</h2>
-      {showProfiling2(data.profile)}
+      {showProfiling(data.profile)}
     </div>
   ) : null;
 
