@@ -13,7 +13,7 @@ base:
             sq.stop_time
         from
             (select session_id, stmt_id, command_class, sql_text, error_text, success, cpu, posix_time(start_time) as start_time, posix_time(stop_time) as stop_time from EXA_DBA_AUDIT_SQL sss where sss.start_time < from_posix_time({{ stop_time }}) and sss.stop_time >= from_posix_time({{ start_time }}) union all 
-             select session_id, stmt_id, 'RUNNING' as command_class, sql_text, remarks as error_text, true as success, max(cpu) as cpu, min(posix_time(now()) - duration) as start_time, posix_time(now()) as stop_time from exa_dba_profile_running group by 1,2,3,4,5) sq
+             select session_id, stmt_id, 'RUNNING' as command_class, sql_text, '' as error_text, true as success, max(cpu) as cpu, min(posix_time(now()) - duration) as start_time, posix_time(now()) as stop_time from exa_dba_profile_running group by 1,2,3,4,5) sq
             left join EXA_DBA_AUDIT_SESSIONS ss on ss.session_id = sq.session_id
             left join revolut.metabase_users mbu on substr(regexp_substr(sql_text, '-- Metabase:: userID: ([0-9]+)'), 23) = mbu.id
             where sq.start_time < {{ stop_time }} and sq.stop_time >= {{ start_time }}

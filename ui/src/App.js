@@ -206,7 +206,7 @@ export default class App extends Component {
     const isLoading = this.state.isLoading ? (
       <div className="loaderIndicator">Loading data...</div>
     ) : null;
-    console.warn(this.props.popupContent);
+    
     return (
       <div className="App">
         {isLoading}
