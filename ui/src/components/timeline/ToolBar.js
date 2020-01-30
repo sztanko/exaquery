@@ -103,7 +103,7 @@ class ToolBar extends Component {
             placeholder="Search"
           />
         </div>
-
+        
         <div className="datePicker panel">
           Range is {start_dt.preciseDiff(stop_dt)}, starting from
           <DateTimePicker onChange={this.onDateChange} value={from_date} />
@@ -119,6 +119,7 @@ class ToolBar extends Component {
             Auto Refresh
           </label>
           <button onClick={this.props.onFlushClick}>Flush statistics</button>
+          &nbsp;(V0.12)
         </div>
       </div>
     );
