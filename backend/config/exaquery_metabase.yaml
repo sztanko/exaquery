@@ -4,7 +4,7 @@ threshold: 5
 base:
     queries: |
         select
-            concat(ss.user_name,' ', ss.host,' ', coalesce(mbu.email, os_user)) as gr,
+            concat(ss.user_name,' [', replace(regexp_substr(ss.client,  '[^\s]+'), 'Generic','JDBC') ,'] ', coalesce(mbu.email, os_user)) as gr,
             concat(sq.command_class, '_', coalesce(sq.session_id, cast(random(1000000000, 10000000000) as int)), '_', sq.stmt_id) as box_id,
             sq.command_class as modifier,
             sq.success as flag,
@@ -25,7 +25,7 @@ base:
             order by null
     sessions: |
         select
-            concat(ss.user_name,' ', ss.host,' ', os_user) as gr,
+            concat(ss.user_name,' [', replace(regexp_substr(ss.client,  '[^\s]+'), 'Generic','JDBC') ,'] ', os_user) as gr,
             concat('SESSIONSTART', '_', coalesce(ss.session_id, cast(random(1000000000, 10000000000) as int)), '_0') as box_id,
             'SESSIONSTART' as modifier,
             ss.success as flag,
