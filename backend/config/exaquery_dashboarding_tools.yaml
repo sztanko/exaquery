@@ -1,10 +1,10 @@
-name: exaquery_metabase
+name: exaquery_dashboarding_tools
 granularity: 100
 threshold: 5
 base:
     queries: |
         select
-            concat(ss.user_name,' [', replace(regexp_substr(ss.client,  '[^\s]+'), 'Generic','JDBC') ,'] ', coalesce(mbu.email, os_user)) as gr,
+            concat(ss.user_name,' [', replace(regexp_substr(ss.client,  '[^\s]+'), 'Generic','JDBC') ,'] ', coalesce(mbu.email, lu.email, os_user)) as gr,
             concat(sq.command_class, '_', coalesce(sq.session_id, cast(random(1000000000, 10000000000) as int)), '_', sq.stmt_id) as box_id,
             sq.command_class as modifier,
             sq.success as flag,
@@ -16,6 +16,7 @@ base:
              select session_id, stmt_id, 'RUNNING' as command_class, sql_text, '' as error_text, true as success, max(cpu) as cpu, min(posix_time(now()) - duration) as start_time, posix_time(now()) as stop_time from exa_dba_profile_running group by 1,2,3,4,5) sq
             left join EXA_DBA_AUDIT_SESSIONS ss on ss.session_id = sq.session_id
             left join revolut.metabase_users mbu on substr(regexp_substr(sql_text, '-- Metabase:: userID: ([0-9]+)'), 23) = mbu.id
+            left join bi.looker_users lu on ss.user_name = 'LOOKER' and substr(regexp_substr(sql_text, '"user_id":([0-9]+)'), 11) = lu.id
             where sq.start_time < {{ stop_time }} and sq.stop_time >= {{ start_time }}
             and (ss.logout_time is null or ss.logout_time >= from_posix_time({{start_time}})) 
             and ss.login_time <= from_posix_time({{stop_time}})
@@ -46,7 +47,7 @@ base:
 info:
     info: |
         select sq.*, 
-            ss.login_time, coalesce(ss.logout_time, now()), ss.user_name, ss.client, ss.driver, ss.encrypted, ss.host, coalesce(mbu.email, ss.os_user) as os_user,
+            ss.login_time, coalesce(ss.logout_time, now()), ss.user_name, ss.client, ss.driver, ss.encrypted, ss.host, coalesce(mbu.email, lu.email, ss.os_user) as os_user,
            ss.os_name, ss.success as session_success
             from (select session_id, stmt_id, command_name, command_class, duration, start_time, stop_time, cpu, temp_DB_RAM_PEAK, PERSISTENT_DB_RAM_PEAK, HDD_READ, HDD_WRITE, NET, SUCCESS, ERROR_CODE, ERROR_TEXT, SCOPE_SCHEMA, PRIORITY, NICE, RESOURCES,ROW_COunt, EXECUTION_MODE, SQL_TEXT from EXA_DBA_AUDIT_SQL 
                 UNION ALL
@@ -55,6 +56,7 @@ info:
             ) sq
                 left join EXA_DBA_AUDIT_SESSIONS ss on ss.session_id = sq.session_id
                 left join revolut.metabase_users mbu on substr(regexp_substr(sql_text, '-- Metabase:: userID: ([0-9]+)'), 23) = mbu.id
+                left join bi.looker_users lu on ss.user_name = 'LOOKER' and substr(regexp_substr(sql_text, '"user_id":([0-9]+)'), 11) = lu.id
         where 
             ss.session_id={{box_id.split("_")[1]}} 
             {% if box_id.split("_")[0] != 'SESSIONSTART' %}
