@@ -2,7 +2,7 @@ Flask-Caching==1.4.0
 Flask-Cors==3.0.9
 Flask==1.0.2
 Jinja2==2.11.3
-Werkzeug==0.15.3
+Werkzeug==2.2.3
 gevent==1.4.0
 pyaml==18.11.0
 pyexasol==0.11.1
